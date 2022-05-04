@@ -24,6 +24,7 @@ Donde UbuntuServer es el nombre de la maquina virtual
 3)  Luego se puede instalar KVM
 
         sudo apt -y install qemu-kvm libvirt-daemon bridge-utils virtinst libvirt-daemon-system
+        
 Y luego las herramientas de administracion
 
         sudo apt -y install virt-top libguestfs-tools libosinfo-bin  qemu-system virt-manager
@@ -39,6 +40,7 @@ Por último debemos estar seguros que el módulo de red este activo
         echo vhost_net | sudo tee -a /etc/modules
         
 4)  Luego cree un par de llaves ssh para este usuario
+          
           ssh-keygen
           Generating public/private rsa key pair.
           Enter file in which to save the key (/home/jorge/.ssh/id_rsa):
@@ -61,22 +63,27 @@ Por último debemos estar seguros que el módulo de red este activo
 TERRAFORMAR
 1)  Instalar Terraform:
 Terraform es una herramienta para infraestructura, como código (la más utilizada), y se distribuye directamente como, binario.
+        
         sudo apt install wget curl unzip
         TER_VER=`curl -s https://api.github.com/repos/hashicorp/terraform/releases/latest | grep tag_name | cut -d: -f2 | tr -d \"\,\v | awk '{$1=$1};1'`
         wget https://releases.hashicorp.com/terraform/${TER_VER}/terraform_${TER_VER}_linux_amd64.zip
+        
 2)  Una vez que, el archivo este en la maquina virtual, es necesario copiar el binario en /usr/local/bin
 
         unzip terraform_${TER_VER}_linux_amd64.zip
         Archive:  terraform_1.1.8_linux_amd64.zip
           inflating: terraform  
         sudo mv terraform /usr/local/bin/
+        
 Por último verificar que Terraform está listo para usar
 
             terraform --version
             Terraform v1.1.8
             on linux_amd64
+            
 3)  Instalar, el proveedor de KVM de Terraform.
 El proveedor de KVM, nos proporciona KVM a través de libvirt. Este esta mantenido por Duncan Mac-Vicar P junto con otros contribuidores El proveedor se autoinstala asi solo es necesario declararlo.
+
           terraform {
             required_providers {
               libvirt = {
@@ -91,6 +98,7 @@ El proveedor de KVM, nos proporciona KVM a través de libvirt. Este esta manteni
 
 
 4)  Uso de Terraform para crear una máquina virtual KVM con una imagen de cloud, y la ayuda de cloud init.
+      
         mkdir -p ~/projects/terraform
         cd ~/projects/terraform
 
