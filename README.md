@@ -208,10 +208,93 @@ main.tf
 
     wget https://cloud-images.ubuntu.com/bionic/current/bionic-server-cloudimg-amd64.img
  
+ 9) Aumentar el tamaño del disco de la maquina virtual.
+La maquina virtual por defecto de ubuntu bionic es de aproximadamente 3G, y necesitaremos más espacio una vez creada por lo que debemos cambiar su tamaño de uso (no se cambiara el tamaño del archivo)
+
+    qemu-img resize bionic-server-cloudimg-amd64.img 32G 
+
+10) Ejecutar Terraformar
+Con todas las piezas listas solo queda ejecutar Terraform son cuatro comandos los mas utilizados: terraform init(que prepara todo el ambiente), terraform planque se encarga de crear un plan de ejecución, luego terraform applyque aplica la configuración y por último terraform destroyque destruye todo lo echo.
+
+ANSIBLE
+11)  instalacion
+Ansible es una herramienta de configuración programada (Configuration management), que se apoya en el concepto de infraestructura como código (Infrastructure as Code). La primera versión apareció en 2012 de la mano de Michael DeHaan como un pequeño proyecto en github, que en unos meses, tubo un ascenso meteorico, (17,000 estrellas y mas de 14100 contribuidores en github).
+
+La instalación es regular, con los administradores de paquetes de cada distribución en caso de ubuntu:
+
+      sudo apt-add-repository ppa:ansible/ansible
+      sudo apt-get update
+      sudo apt-get install ansible
+      
+12) Creación del playBook
+Al igual que terraform Asible trabaja con varios archivos de configuración, en este caso usaremos dos: El primero llamado simplemente inventario (en su vesrión antigua)
+
+inventario
+
+      [bionic]
+      192.168.122.115 ansible_user=jeffersonbellido ansible_ssh_private_key_file=./bionic.key
+
+      [bionic:vars]
+      http_port=80
+      https_port=443
+
+En este archivo podemos ver dos secciones, la primera es una agrupación de servidores llamada bionic en donde se debe poner la IP de la máquina virtual que devuelve Terraform.
+
+Las variables ansible_user , debe tener el usuario de la máquina virtual; y la variable ansible_ssh_private_key_file debe contener la ruta al archivo que contiene la llave privada de ssh; por seguridad esta llave creada en pasos anteriores debe ser copiada al archivo bionic.key
  
+13) El segundo archivo es el playboock propiamente dicho: 
  
- 
- 
- 
+playbock.yml
+
+        ---
+        - hosts: bionic
+          become: yes
+          become_method: sudo
+          tasks:
+            - name: Make sure that we can connect to te vm 
+              ping:
+            - name: Update an upgrade apt packages
+              apt:
+                upgrade: yes
+                update_cache: yes
+                cache_valid_time: 8600 # One Day  
+            - name: Install docker and some dependencies
+              apt:
+                name: python3-pip, docker.io
+                state: present
+            - name: Start docker service
+              service:
+                  name:  docker  
+                  state: started    
+            - name: INstall docker python module
+              pip:
+                name: docker
+            - name: Create a codiad site
+              docker_container:
+                name: codiad
+                image: bitnami/codiad:latest
+                state: started
+                recreate: yes  
+                ports:
+                  - "{{http_port}}:{{http_port}}"
+                  - "{{https_port}}:{{https_port}}"
+                env:
+                  CODIAD_USERNAME: jeffersonbellido
+                  CODIAD_PASSWORD: sesamo
+
+En este archivo se debe cambiar : CODIAD_USERNAME por el nombre de usuario usado anteriormente
+
+Este playboock realiza las siguientes tareas
+
+Se asegura que existe ping a la maquina virtual.
+Realice el update y el upgrade de la misma
+Instala docker y el modulo de pyton para trabajar con los contenedores
+Levanta el servicio de docker
+Crea un contenedor de código , que es un ID echo en JS. (por ejemplo)
+14) Por último ejecutamos el playboock con ansible-playboock
+
+      ansible-playbook -i inventory playbook.yml
+
+La opción -i especifica el archivo de inventario que se usará.
  
  
