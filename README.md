@@ -14,7 +14,7 @@ En este sentido se debe preparar una máquina virtual con sistema operativo Ubun
 
 En una consola de PowerShell (en modo administrador se debe correr) con la maquina virtual apagada:
 
-Set-VMProcessor -VMName UbuntuServer -ExposeVirtualizationExtensions $true
+       Set-VMProcessor -VMName UbuntuServer -ExposeVirtualizationExtensions $true
 
 Donde UbuntuServer es el nombre de la maquina virtual
 
