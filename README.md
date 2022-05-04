@@ -106,6 +106,7 @@ El proveedor de KVM, nos proporciona KVM a través de libvirt. Este esta manteni
 5)  se deben crear tres archivos : Primer archivo
 
 main.tf
+
                 terraform {
                   required_providers {
                     libvirt = {
@@ -113,7 +114,6 @@ main.tf
                     }
                   }
                 }
-
                 provider "libvirt" {
                   uri = "qemu:///system"
                 }
