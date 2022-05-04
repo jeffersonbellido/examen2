@@ -106,17 +106,17 @@ El proveedor de KVM, nos proporciona KVM a través de libvirt. Este esta manteni
 5)  se deben crear tres archivos : Primer archivo
 
 main.tf
-        terraform {
-          required_providers {
-            libvirt = {
-              source = "dmacvicar/libvirt"
-            }
-          }
-        }
+                terraform {
+                  required_providers {
+                    libvirt = {
+                      source = "dmacvicar/libvirt"
+                    }
+                  }
+                }
 
-        provider "libvirt" {
-          uri = "qemu:///system"
-        }
+                provider "libvirt" {
+                  uri = "qemu:///system"
+                }
       
 6)  El segundo archivo libvirt.tf
 
